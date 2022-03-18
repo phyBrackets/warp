@@ -4,6 +4,7 @@ import {
   Literal,
   LiteralKind,
   TupleExpression,
+  ParameterList,
   VariableDeclaration,
 } from 'solc-typed-ast';
 import { AST } from '../ast/ast';
@@ -80,4 +81,11 @@ export function createUint256TypeName(ast: AST): ElementaryTypeName {
   );
   ast.setContextRecursive(typeName);
   return typeName;
+}
+
+export function createParameterList(
+  params: Iterable<VariableDeclaration>,
+  ast: AST,
+): ParameterList {
+  return new ParameterList(ast.reserveId(), '', 'ParameterList', params);
 }

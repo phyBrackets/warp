@@ -7,8 +7,9 @@ import {
   EnumConverter,
   ExpressionSplitter,
   ExternImporter,
-  PublicStateVarsGetterGenerator,
+  FunctionModifierHandler,
   IdentifierMangler,
+  IfFunctionaliser,
   ImplicitConversionToExplicit,
   InheritanceInliner,
   IntBoundCalculator,
@@ -16,6 +17,7 @@ import {
   LoopFunctionaliser,
   MemoryHandler,
   NamedArgsRemover,
+  PublicStateVarsGetterGenerator,
   RejectUnsupportedFeatures,
   ReturnInserter,
   ReturnVariableInitializer,
@@ -29,7 +31,6 @@ import {
   UsingForResolver,
   VariableDeclarationExpressionSplitter,
   VariableDeclarationInitialiser,
-  IfFunctionaliser,
 } from './passes';
 import { TranspilationAbandonedError, TranspileFailedError } from './utils/errors';
 import { printCompileErrors, runSanityCheck } from './utils/utils';
@@ -75,6 +76,7 @@ function applyPasses(ast: AST, options: TranspilationOptions): AST {
     ['Ib', IntBoundCalculator],
     ['M', IdentifierMangler],
     ['Ii', InheritanceInliner],
+    ['Fm', FunctionModifierHandler],
     ['Sa', StorageAllocator],
     ['Ec', EnumConverter],
     ['Ei', ExternImporter],
