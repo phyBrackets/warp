@@ -7,6 +7,7 @@ import {
   Break,
   Continue,
   ElementaryTypeName,
+  ElementaryTypeNameExpression,
   ExpressionStatement,
   FunctionCall,
   FunctionDefinition,
@@ -17,6 +18,7 @@ import {
   IndexAccess,
   Literal,
   Mapping,
+  MemberAccess,
   ModifierInvocation,
   OverrideSpecifier,
   ParameterList,
@@ -26,8 +28,6 @@ import {
   UserDefinedTypeName,
   VariableDeclaration,
   VariableDeclarationStatement,
-  MemberAccess,
-  ElementaryTypeNameExpression,
 } from 'solc-typed-ast';
 import { AST } from '../ast/ast';
 import { CairoFunctionDefinition } from '../ast/cairoNodes';
@@ -388,14 +388,7 @@ function cloneASTNodeImpl<T extends ASTNode>(
       node.raw,
     );
   } else if (node instanceof PlaceholderStatement) {
-    newNode = new PlaceholderStatement(
-      replaceId(node.id, ast, remappedIds),
-      node.src,
-      'PlaceholderStatement',
-      // TODO - It gives an error when writing node.documentation
-      undefined,
-      node.raw,
-    );
+    newNode = clonePlaceholder(node, ast, remappedIds);
   }
 
   if (notNull(newNode) && sameType(newNode, node)) {
@@ -403,6 +396,7 @@ function cloneASTNodeImpl<T extends ASTNode>(
     ast.copyRegisteredImports(node, newNode);
     return newNode;
   } else {
+    console.log(node);
     throw new NotSupportedYetError(`Unable to clone ${printNode(node)}`);
   }
 }
@@ -439,6 +433,22 @@ function cloneContinue(node: Continue, ast: AST, remappedIds: Map<number, number
     replaceId(node.id, ast, remappedIds),
     node.src,
     'Continue',
+    node.documentation,
+    node.raw,
+  );
+}
+
+// Defining a seperate function instead of inling the code is a workaround to make the typechecker
+// happy, since it can't distinguish between T & PlaceholderStatement and T in cloneASTNode<T extends ASTNode>.
+function clonePlaceholder(
+  node: PlaceholderStatement,
+  ast: AST,
+  remappedIds: Map<number, number>,
+): PlaceholderStatement {
+  return new PlaceholderStatement(
+    replaceId(node.id, ast, remappedIds),
+    node.src,
+    'PlaceholderStatement',
     node.documentation,
     node.raw,
   );
